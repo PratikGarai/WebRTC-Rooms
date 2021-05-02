@@ -7,6 +7,8 @@ const grid = document.getElementById("grid");
 const myVideo = document.createElement('video');
 myVideo.muted = true;
 
+const activeCalls = {};
+
 peer.on('open', (id) => {
     socket.emit('enter-call', RID, id);
 });
@@ -23,10 +25,11 @@ navigator.mediaDevices.getUserMedia({
 
     peer.on('call', (call) => {
         call.answer(stream);
+
         const oldVideo = document.createElement('video');
         call.on('stream', stream => {
             addStream(oldVideo, stream);
-        })
+        });
     });
 });
 
@@ -41,11 +44,20 @@ const addStream = (video, stream) => {
 
 const connectUser = (userId, stream) => {
     const call = peer.call(userId, stream);
+
     const newVideo = document.createElement('video');
     call.on('stream', stream => {
         addStream(newVideo, stream);
     });
+
     call.on('close', ()=> {
         newVideo.remove();
     });
+
+    activeCalls[userId] = call;
 }
+
+socket.on('user-disconnected', (userId) => {
+    if(activeCalls[userId])
+        activeCalls[userId].close();
+});
