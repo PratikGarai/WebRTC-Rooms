@@ -1,9 +1,17 @@
 const express = require("express");
 const app = express();
 const server = require('http').Server(app);
-const io = require("socket.io")(server);
-const { v4 } = require("uuid");
+const io = require("socket.io")(server, {
+    cors : {
+        origin : "*",
+        methods: ["GET, POST"],
+    }
+});
 
+const { v4 } = require("uuid");
+const cors = require("cors");
+
+app.use(cors());
 app.set('view engine', 'ejs');
 app.use(express.static('static'));
 
@@ -18,7 +26,8 @@ app.get('/:roomId', (req, res, next)=> {
 
 io.on('connection', socket => {
     socket.on('enter-call', (roomId, userId) => {
-        console.log(roomId, userId);
+        socket.join(roomId);
+        socket.to(roomId).emit('user-connected', userId);
     })
 })
 

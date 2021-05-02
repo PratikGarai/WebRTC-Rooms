@@ -4,10 +4,11 @@
         <title>Conference Room</title>
         <link rel="stylesheet" href="styles.css"></link>
 
-        <script>
+        <script defer>
             const RID = "<%= roomId %>";
         </script>
-        <script src="/socket.io/socket.io.js"></script>
+        <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js" defer></script>
+        <script src="/socket.io/socket.io.js" defer></script>
         <script src="script.js" defer></script>
     </head>
 
